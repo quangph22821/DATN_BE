@@ -7,7 +7,7 @@ import { getAll, getUserProfile } from "../controllers/user";
 const router = express.Router();
 router.get("/user", getAll);
 router.get("/user/profile",getUserProfile);
-// router.delete("/user/:id",remove);
-// router.put("/user/:id", update);
+router.delete("/user/:id",remove);
+router.put("/user/:id", update);
 
 export default router;
