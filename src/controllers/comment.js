@@ -37,3 +37,20 @@ export const getCommentOneId= async(req,res)=>{
 
     }
 }
+export const commentAdd = async (req, res) => {
+    console.log(req.body);
+
+    try {
+        // Assuming comment.create returns the created comment
+        const createdComment = await comment.create(req.body);
+        console.log(createdComment);
+
+        // Assuming you want to send a success response with the created comment
+        res.status(201).json(createdComment);
+    } catch (error) {
+        console.error('Error creating comment:', error);
+
+        // Assuming you want to send an error response
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
