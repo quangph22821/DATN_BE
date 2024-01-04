@@ -54,3 +54,22 @@ export const commentAdd = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+export const getDelete=async(req,res)=>{
+    const data= await comment.findByIdAndDelete(req.params.id)
+    try{
+        if(!data){
+            return res.json({
+                message: "Comment not deleted "
+            })
+        }
+        else{
+            return res.json({
+                message: "Comment deleted successfully",
+                data
+            })
+        }
+
+    }catch(error){
+        console.log(message.error);
+    }
+}
