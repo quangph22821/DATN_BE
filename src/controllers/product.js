@@ -62,3 +62,38 @@ export const postProduct = async (req, res) => {
         });
     }
 }
+
+export const putProduct = async (req, res) => {
+    try {
+        const product = await Product.findOneAndUpdate({ _id: req.params.id }, req.body, {
+            new: true,
+        });
+        if (!product) {
+            return res.status(404).json({
+                message: "khong co san pham"
+            })
+        }
+        return res.json({
+            message: "sua thanh cong",
+            product,
+        })
+    } catch (error) {
+        return res.status(404).json({
+            message: error
+        })
+    }
+}
+
+export const deleteProduct = async (req, res) => {
+    try {
+        const product = await Product.findByIdAndDelete(req.params.id);
+        res.json({
+            message: "xoá thanh cong",
+            product,
+        })
+    } catch (error) {
+        return res.status(404).json({
+            message: error
+        })
+    }
+}
