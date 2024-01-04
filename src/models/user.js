@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 const userSchema = new mongoose.Schema(
     {
-        name: {                                                                             
+        name: {
             type: String,
-            required:true,  
+            required: true,
         },
         email: {
             type: String,
@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required:true,  
+            required: true,
         },
         role: {
             type: String,
@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema(
             type: mongoose.Types.ObjectId,
             ref: "Cart",
         },
+        billsId: [{ type: Types.ObjectId, ref: "Bill" }]
 
     },
     { timestamps: true, versionKey: false }
