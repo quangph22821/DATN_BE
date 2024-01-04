@@ -58,3 +58,47 @@ export const signup = async (req, res) => {
         })
      }
 };
+
+
+export const signin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const { error } = signinSchema.validate(req.body, { abortEarly: false });
+        //validate
+        if (error) {
+            const errors = error.details.map((err) => err.message);
+            return res.status(400).json({
+                message: errors,
+            });
+        }
+
+        //kiểm tra email
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({
+                message: "Tài khoản không tồn tại",
+            });
+        }
+        // nó vừa mã hóa và vừa so sánh
+        const isMatch = await bcryptjs.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({
+                message: "Sai mật khẩu",
+            });
+        }
+
+        user.password = undefined;
+        // tạo token từ server
+        const token = jwt.sign({ _id: user._id }, process.env.SECRET_KEY, { expiresIn: 60 * 60 });
+
+        return res.status(201).json({
+            message: "Đăng nhập thành công",
+            accessToken: token,
+            user,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message,
+        })
+     }
+};
