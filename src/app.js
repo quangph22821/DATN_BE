@@ -1,5 +1,5 @@
 import express from "express";
-
+import commentRouter from "./routes/comment"
 import cors from "cors"
 
 
@@ -17,6 +17,7 @@ app.use("", materialRouter);
 app.use("", originRouter);
 app.use("", userRouter);
 app.use("", billRouter);
+app.use("", commentRouter)
 
 
 
