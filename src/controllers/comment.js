@@ -19,3 +19,21 @@ export const getCommentALL= async(req,res)=>{
             // });
         }
 }
+export const getCommentOneId= async(req,res)=>{
+    console.log(req.params.id);
+    try{
+        const commentId = await comment.findById(req.params.id)
+        console.log(req.params.id);
+        if(!commentId){
+            res.status(404).json({
+                message:"không có dữ liệu"
+            })
+        }
+        return res.json({
+            message:"bạn lấy 1 id thành công",
+            commentId
+        })
+    }catch{
+
+    }
+}
