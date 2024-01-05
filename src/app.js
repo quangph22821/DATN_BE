@@ -1,6 +1,16 @@
 import express from "express";
 import commentRouter from "./routes/comment"
+import productRouter from "./routes/product";
+import authRouter from "./routes/auth";
+import categoryRouter from "./routes/category";
+import cartRouter from "./routes/cart";
+import materialRouter from "./routes/material";
+import originRouter from "./routes/origin";
+import userRouter from "./routes/user";
+import staticRouter from"./routes/static"
+import billRouter from"./routes/bill"
 import cors from "cors"
+import mongoose from "mongoose";
 
 
 const app = express();
@@ -18,6 +28,7 @@ app.use("", originRouter);
 app.use("", userRouter);
 app.use("", billRouter);
 app.use("", commentRouter)
+app.use("", staticRouter);
 
 
 
