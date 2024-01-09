@@ -5,8 +5,6 @@ import authRouter from "./routes/auth";
 
 import categoryRouter from "./routes/category";
 
-import categoryRouter from "./routes/category";
-
 // import cartRouter from "./routes/cart";
 import materialRouter from "./routes/material";
 import originRouter from "./routes/origin";

@@ -4,8 +4,6 @@ import express from "express";
 
 import { getAll,remove,update, getUserProfile } from "../controllers/user";
 
-import { getAll, getUserProfile, remove, update } from "../controllers/user";
-
 // import { authenticate } from "../middlewares/authenticate";
 
 const router = express.Router();
