@@ -209,7 +209,15 @@ export const deleteAllProductCart = async (req, res) => {
 // CheckOut
 export const checkOut = async (req, res) => {
   const { _id: userId } = req.user;
-  const { shippingAddress, paymentMethod, phone } = req.body;
+  const {
+    phone,
+    city,
+    district,
+    commune,
+    shippingAddress,
+    paymentMethod,
+    paymentStatus,
+  } = req.body;
   try {
     // Tìm kiếm giỏ hàng của người dùng
     const cart = await Cart.findOne({ userId });
@@ -230,12 +238,16 @@ export const checkOut = async (req, res) => {
       const bill = await Bill.create({
         userId,
         cartId: cart._id,
+        phone: phone,
+        city: city,
+        district: district,
+        commune: commune,
         shippingAddress: shippingAddress,
         totalPrice: cart.totalPrice,
         shippingFee: cart.shippingFee,
         totalOrder: cart.totalOrder,
         paymentMethod: paymentMethod,
-        phone:phone,
+        paymentStatus: paymentStatus,
         products: cart.products,
       });
 
