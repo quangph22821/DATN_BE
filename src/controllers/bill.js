@@ -75,8 +75,46 @@ export const updateBill = async (req, res) => {
       return res.status(400).json({ message: "Không có hóa đơn!" });
     }
 
-    if (status) {
-      bill.status = status;
+    if (bill.status === "Chờ xác nhận") {
+      if (
+        status === "Đã xác nhận" ||
+        status === "Đang giao hàng" ||
+        status === "Đã giao hàng" ||
+        status === "Hủy đơn hàng"
+      ) {
+        bill.status = status;
+      } else {
+        return res
+          .status(400)
+          .json({
+            message: "Không thể chuyển từ 'Chờ xác nhận' sang trạng thái khác.",
+          });
+      }
+    } else if (bill.status === "Đã xác nhận") {
+      if (
+        status === "Đang giao hàng" ||
+        status === "Đã giao hàng" ||
+        status === "Hủy đơn hàng"
+      ) {
+        bill.status = status;
+      } else {
+        return res
+          .status(400)
+          .json({
+            message: "Không thể chuyển từ 'Đã xác nhận' sang trạng thái khác.",
+          });
+      }
+    } else if (bill.status === "Đang giao hàng") {
+      if (status === "Đã giao hàng" || status === "Hủy đơn hàng") {
+        bill.status = status;
+      } else {
+        return res
+          .status(400)
+          .json({
+            message:
+              "Không thể chuyển từ 'Đang giao hàng' sang trạng thái khác.",
+          });
+      }
     }
     if (paymentStatus) {
       bill.paymentStatus = paymentStatus;
