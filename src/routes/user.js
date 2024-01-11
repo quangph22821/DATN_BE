@@ -1,7 +1,7 @@
 import express from "express";
 
 // import { checkPermission } from "../middlewares/checkPermission";
-import { getAll, getUserProfile } from "../controllers/user";
+import { getAll, getUserProfile, remove, update } from "../controllers/user";
 // import { authenticate } from "../middlewares/authenticate";
 
 const router = express.Router();

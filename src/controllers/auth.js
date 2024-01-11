@@ -2,7 +2,7 @@ import bcryptjs from "bcryptjs";
 import dotenv from "dotenv"
 import User from "../models/user";
 import jwt from "jsonwebtoken"
-import { signinSchema, signupSchema } from "../schemas/auth"
+import { signinSchema, signupSchema } from "../schema/auth"
 
 dotenv.config();
 
