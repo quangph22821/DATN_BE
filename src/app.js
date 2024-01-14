@@ -2,9 +2,7 @@ import express from "express";
 import commentRouter from "./routes/comment"
 import productRouter from "./routes/product";
 import authRouter from "./routes/auth";
-
 import categoryRouter from "./routes/category";
-
 // import cartRouter from "./routes/cart";
 import materialRouter from "./routes/material";
 import originRouter from "./routes/origin";
@@ -21,7 +19,7 @@ app.use(cors());
 app.use(express.json());
 
 // router
-app.use("", productRouter);
+app.use("", productRouter );
 app.use("", categoryRouter);
 app.use("", authRouter);
 // app.use("", cartRouter);
