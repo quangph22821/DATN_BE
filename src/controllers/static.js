@@ -26,31 +26,42 @@ const aggregateTotalPrice = async (matchExpression) => {
   }
 };
 
-export const getTotalPriceByDate = async (req, res) => {
+export const getTotalPriceByYear = async (req, res) => {
   try {
-    const { selectedYear, selectedMonth, selectedDay } = req.body;
+    const { selectedYear } = req.query;
 
-    if (!selectedYear || !selectedMonth || !selectedDay) {
-      return res
-        .status(400)
-        .json({ message: "Vui lòng chọn năm, tháng và ngày!" });
+    if (!selectedYear) {
+      return res.status(400).json({ message: "Vui lòng chọn năm!" });
     }
 
     const matchExpression = {
-      $expr: {
-        $and: [
-          { $eq: [{ $year: "$createdAt" }, parseInt(selectedYear)] },
-          { $eq: [{ $month: "$createdAt" }, parseInt(selectedMonth)] },
-          { $eq: [{ $dayOfMonth: "$createdAt" }, parseInt(selectedDay)] },
-        ],
-      },
+      $expr: { $eq: [{ $year: "$createdAt" }, parseInt(selectedYear)] },
     };
 
-    const totalPrice = await aggregateTotalPrice(matchExpression);
+    // Tạo mảng chứa các biểu thức $match cho từng tháng
+    const monthlyMatchExpressions = Array.from({ length: 12 }, (_, index) => {
+      return {
+        $and: [
+          matchExpression,
+          {
+            $expr: {
+              $eq: [{ $month: "$createdAt" }, index + 1], // index + 1 vì tháng trong MongoDB là từ 1 đến 12
+            },
+          },
+        ],
+      };
+    });
+
+    // Tính tổng doanh thu cho từng tháng
+    const monthlyTotalPrices = await Promise.all(
+      monthlyMatchExpressions.map((expression) =>
+        aggregateTotalPrice({ ...expression, ...{ status: "Đã giao hàng" } })
+      )
+    );
 
     return res.status(200).json({
-      message: `Lấy tổng giá trị cho ngày ${selectedDay}/${selectedMonth}/${selectedYear} thành công!`,
-      totalPrice,
+      message: `Lấy tổng giá trị cho những đơn đã giao hàng trong năm ${selectedYear} thành công!`,
+      monthlyTotalPrices,
     });
   } catch (error) {
     return res.status(500).json({
