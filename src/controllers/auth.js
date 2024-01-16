@@ -160,9 +160,6 @@ export const forgotPassword = async (req, res) => {
 };
 
 
-
-
-
 export const update = async (req, res) => {
   try {
     // Kiểm tra nếu yêu cầu không chứa trường mật khẩu mới
