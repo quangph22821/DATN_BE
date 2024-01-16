@@ -140,3 +140,54 @@ export const getOrderSuccessRate = async (req, res) => {
     });
   }
 };
+
+// THỐNG KÊ DANH MỤC
+export const getTopSellingProducts = async (req, res) => {
+  try {
+    const bills = await Bill.find({})
+      .populate('products.productId')
+      .populate('userId');
+
+    if (!bills || bills.length === 0) {
+      return res.status(400).json({ message: 'Không có hóa đơn!' });
+    }
+
+    // Tạo một đối tượng để theo dõi số lượng bán của từng sản phẩm
+    const productCounts = {};
+
+    // Duyệt qua mỗi hóa đơn
+    bills.forEach((bill) => {
+      // Duyệt qua từng sản phẩm trong hóa đơn
+      bill.products.forEach((product) => {
+        // Lấy thông tin sản phẩm
+        const { productId, quantity } = product; // Thay 'productId' và 'quantity' bằng trường tương ứng trong model của bạn
+
+        // Tăng số lượng bán của sản phẩm
+        productCounts[productId] = productCounts[productId] || { count: 0, name: product.name }; // Thay 'name' bằng trường tương ứng trong model của bạn
+        productCounts[productId].count += quantity;
+      });
+    });
+
+    // Chuyển đối tượng thành mảng
+    const productInfo = Object.keys(productCounts).map((productId) => ({
+      productId,
+      name: productCounts[productId].name,
+      count: productCounts[productId].count,
+    }));
+
+    // Sắp xếp danh sách theo số lượng giảm dần
+    productInfo.sort((a, b) => b.count - a.count);
+
+    // Giới hạn danh sách chỉ lấy 8 sản phẩm đầu tiên
+    const top8Products = productInfo.slice(0, 8);
+
+    return res.status(200).json({
+      message: 'Lấy thông tin sản phẩm bán chạy thành công!',
+      topSellingProducts: top8Products,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
