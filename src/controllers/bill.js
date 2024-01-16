@@ -154,7 +154,7 @@ export const cancelBill = async (req, res) => {
 
     if (
       bill.status !== "Chờ xác nhận" &&
-      bill.paymentMethod !== "PayOnDelivery"
+      bill.paymentMethod !== "Thanh toán khi nhận hàng"
     ) {
       return res.status(400).json({ message: "Bạn không thể hủy đơn hàng!" });
     }
