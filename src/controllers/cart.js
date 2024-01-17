@@ -80,6 +80,7 @@ export const addToCart = async (req, res) => {
       cart.products.push({
         productId: product._id,
         quantity: quantity,
+        name: product.name,
         price: product.price * quantity,
       });
     } else {
