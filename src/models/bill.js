@@ -29,7 +29,7 @@ const billSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["EWallets", "PayOnDelivery", "BankTransfer"],
+      enum: ["Ví điện tử", "Thanh toán khi nhận hàng"],
       required: true,
     },
     products: [
@@ -37,6 +37,7 @@ const billSchema = new mongoose.Schema(
         productId: { type: Types.ObjectId, ref: "Product" },
         quantity: Number,
         price: Number,
+        name: String
       },
     ],
     paymentStatus: {
@@ -59,8 +60,7 @@ const billSchema = new mongoose.Schema(
 );
 billSchema.pre("save", function (next) {
   if (
-    this.paymentMethod === "EWallets" ||
-    this.paymentMethod === "BankTransfer"
+    this.paymentMethod === "Ví điện tử"
   ) {
     this.paymentStatus = "Paid";
   } else {

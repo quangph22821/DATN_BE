@@ -2,6 +2,9 @@ import Cart from "../models/cart.js";
 import User from "../models/user.js";
 import Product from "../models/product.js";
 import Bill from "../models/bill.js";
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+dotenv.config();
 
 // Get All Cart
 export const getCarts = async (req, res) => {
@@ -77,6 +80,7 @@ export const addToCart = async (req, res) => {
       cart.products.push({
         productId: product._id,
         quantity: quantity,
+        name: product.name,
         price: product.price * quantity,
       });
     } else {
@@ -218,19 +222,16 @@ export const checkOut = async (req, res) => {
     paymentMethod,
     paymentStatus,
   } = req.body;
+
   try {
     // Tìm kiếm giỏ hàng của người dùng
     const cart = await Cart.findOne({ userId });
-  console.log("216",cart._id);
     // Nếu không có giỏ hàng thì trả về lỗi
     if (!cart || cart.products.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Không tìm thấy sản phẩm nào!" });
-    } 
-    
-    
-    if(cart) {
+      return res.status(400).json({ message: "Không tìm thấy sản phẩm nào!" });
+    }
+
+    if (cart) {
       // Lấy thông tin user
       const user = await User.findById(userId);
 
@@ -251,24 +252,72 @@ export const checkOut = async (req, res) => {
         products: cart.products,
       });
 
-      // Populate đến bảng user
-      await bill.populate("userId");
+      // Gửi email thông báo
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: `${process.env.MAIL_USERNAME}`, // Thay bằng địa chỉ email của bạn
+          pass: `${process.env.MAIL_PASSWORD}`, // Thay bằng mật khẩu email hoặc ứng dụng mật khẩu nếu có
+        },
+      });
+      const formattedProducts = cart.products
+        .map((product) => {
+          console.log(product);
+          return `<tr> 
+                  <td>${product.name}</td>
+                  <td>${product.quantity}</td>
+                  <td>${product.price}</td>
+                </tr>`;
+        })
+        .join("");
+
+      const emailContent = `
+        <p>Chúc mừng! Bạn đã đặt hàng thành công. Chi tiết đơn hàng:</p>
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Sản phẩm</th>
+              <th>Số lượng</th>
+              <th>Giá</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${formattedProducts}
+          </tbody>
+        </table>
+        <p>Tổng tiền thanh toán: ${cart.totalOrder}</p>
+        <p>Số điện thoại: ${phone}</p>
+        <p>Địa chỉ giao hàng: ${shippingAddress}, ${commune}, ${district}, ${city}</p>
+        <p>Phương thức thanh toán: ${paymentMethod}</p>
+      `;
+
+      const mailOptions = {
+        from: `${process.env.MAIL_USERNAME}`, // Thay bằng địa chỉ email của bạn
+        to: user.email, // Lấy email từ đối tượng user
+        subject: "Đặt hàng thành công",
+        html: emailContent,
+      };
+
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.error(error.message);
+        } else {
+          console.log("Email sent: " + info.response);
+        }
+      });
 
       // Sau khi tạo bill cập nhật lại giỏ hàng
-      (cart.totalPrice = 0),
-        (cart.totalOrder = 0),
-        (cart.products = []),
-        await cart.save();
+      cart.totalPrice = 0;
+      cart.totalOrder = 0;
+      cart.products = [];
+      await cart.save();
 
       // Sau khi tạo bill thêm id bill vào bảng user
       user.billsId.push(bill._id);
-
       await user.save();
-      
-      return res.status(200).json({ message: "Đặt hàng thành công!",bill  });
+
+      return res.status(200).json({ message: "Đặt hàng thành công!", bill });
     }
-
-
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
